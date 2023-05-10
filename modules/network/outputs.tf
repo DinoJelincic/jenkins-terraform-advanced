@@ -9,4 +9,6 @@ output "public_subnets" {
 output "private_subnets" {
     value = aws_subnet.private_subnet
 }
-
+output "project_name" {
+    value = var.project_name
+}
