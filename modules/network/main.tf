@@ -112,24 +112,24 @@ locals {
    ]
 }
 
-# resource "aws_vpc_endpoint" "endpoint" {
-#    count          = length(local.endpoints)
-#    vpc_id         = aws_vpc.advanced_jenkins_vpc.id
-#    service_name   = local.endpoints[count.index]
+resource "aws_vpc_endpoint" "endpoint" {
+   count          = length(local.endpoints)
+   vpc_id         = aws_vpc.advanced_jenkins_vpc.id
+   service_name   = local.endpoints[count.index]
 
-#    subnet_ids           = [for subnet in aws_subnet.private_subnet : subnet.id]
-#    security_group_ids   = [var.vpc_endpoints_sg]
-#    private_dns_enabled  = true
-#    vpc_endpoint_type    = "Interface"
+   subnet_ids           = [for subnet in aws_subnet.private_subnet : subnet.id]
+   security_group_ids   = [var.vpc_endpoints_sg]
+   private_dns_enabled  = true
+   vpc_endpoint_type    = "Interface"
 
-#    # This is going to tag all endpoints based on what they are,
-#    # for example: PREFIX-sts-endpoint, PREFIX-ecs-endpoint
-#    tags = {
-#       Name = "${var.project_name}-${
-#          try(
-#             replace(split(local.endpoints[count.index], "${var.aws_region}.")[1]), ".", "-",
-#             split(local.endpoints[count.index], ".")[3]
-#          )
-#       }-endpoint"
-#    }
-# }
+   # This is going to tag all endpoints based on what they are,
+   # for example: PREFIX-sts-endpoint, PREFIX-ecs-endpoint
+   tags = {
+      Name = "${var.project_name}-${
+         try(
+            replace(split(local.endpoints[count.index], "${var.aws_region}.")[1]), ".", "-",
+            split(local.endpoints[count.index], ".")[3]
+         )
+      }-endpoint"
+   }
+}
