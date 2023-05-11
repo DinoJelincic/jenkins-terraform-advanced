@@ -86,6 +86,64 @@ resource "aws_security_group" "jenkins_controller" {
    }
 
    tags = {
-      Name = "${var.prefix}-jenkins-controller"
+      Name = "${var.project_name}-jenkins-controller"
+   }
+}
+
+# This is the SG for the Jenkins controller EFS
+# - Allows traffic on the Jenkins controller on port 2049
+# - Allows all outbound traffic
+resource "aws_security_group" "jenkins_efs" {
+   name        = "jenkins-efs"
+   description = "Security group for the EFS of the Jenkins controller"
+   vpc_id      = var.vpc_id
+
+   ingress {
+      description       = "Allow traffic from the Jenkins controller"
+      from_port         = "2049"
+      to_port           = "2049"
+      protocol          = "tcp"
+      security_groups   = [aws_security_group.jenkins_controller.id]
+   }
+
+   egress {
+      description = "Allow all outbound traffic"
+      from_port   = "0"
+      to_port     = "0"
+      protocol    = "-1"
+      cidr_blocks = ["0.0.0.0/0"]
+   }
+
+   tags = {
+      Name = "${var.project_name}-jenkins-efs"
+   }
+}
+
+# This is the SG for the VPC endpoints
+# - Allows all traffic through port 443
+# - Allows all outbound traffic 
+resource "aws_security_group" "vpc_endpoints" {
+   name        = "vpc-endpoints"
+   description = "SG for VPC Endpoints"
+   vpc_id      = var.vpc_id
+
+   ingress {
+      description = "Allow HTTPS traffic"
+      from_port   = "443"
+      to_port     = "443"
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+   }
+
+   egress {
+      description = "Allow all outbound traffic"
+      from_port   = "0"
+      to_port     = "0"
+      protocol    = "-1"
+      cidr_blocks = ["0.0.0.0/0"]
+   }
+
+   tags = {
+      Name = "${var.project_name}-vpc-endpoints"
    }
 }
